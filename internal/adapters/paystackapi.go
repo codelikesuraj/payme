@@ -113,8 +113,13 @@ func (adapter *PaystackAPIAdapter) CreatePaymentRequest(pr models.PaymentRequest
 	return body, nil
 }
 
-func (adapter *PaystackAPIAdapter) ListPaymentRequest() (models.ListPaymentRequestResp, error) {
-	req, err := http.NewRequest(http.MethodGet, BASE_URL+PAYMENT_REQUEST_URL, nil)
+func (adapter *PaystackAPIAdapter) ListPaymentRequest(recent bool) (models.ListPaymentRequestResp, error) {
+	url := BASE_URL + PAYMENT_REQUEST_URL
+	if recent {
+		url += "/?perPage=1"
+	}
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	
 	if err != nil {
 		return models.ListPaymentRequestResp{}, err
 	}
@@ -126,7 +131,7 @@ func (adapter *PaystackAPIAdapter) ListPaymentRequest() (models.ListPaymentReque
 		return models.ListPaymentRequestResp{}, err
 	}
 	defer resp.Body.Close()
-
+	
 	var body models.ListPaymentRequestResp
 	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
 		return models.ListPaymentRequestResp{}, err

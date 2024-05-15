@@ -10,8 +10,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-
-
 func init() {
 	rootCmd.AddCommand(createCmd)
 }
@@ -63,7 +61,7 @@ var createCmd = &cobra.Command{
 		data := createdPaymentRequest.Data
 
 		fmt.Println("Payment request created successfully!")
-		fmt.Println()
+		fmt.Println("-------------------------------------------")
 		fmt.Println("Payment Request Details")
 		fmt.Println("-------------------------------------------")
 		fmt.Println("Date:", data.CreatedAt)

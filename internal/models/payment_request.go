@@ -85,7 +85,7 @@ type ListPaymentRequestResp struct {
 	Meta struct {
 		Total     int `json:"total"`
 		Skipped   int `json:"skipped"`
-		PerPage   int `json:"perPage"`
+		PerPage   any `json:"perPage"`
 		Page      int `json:"page"`
 		PageCount int `json:"pageCount"`
 	} `json:"meta"`

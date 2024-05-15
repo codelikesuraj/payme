@@ -8,8 +8,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var recentFlag bool
+
 func init() {
 	rootCmd.AddCommand(listCmd)
+	listCmd.PersistentFlags().BoolVar(&recentFlag, "recent", false, "get the most recent payment request")
 }
 
 var listCmd = &cobra.Command{
@@ -19,29 +22,38 @@ var listCmd = &cobra.Command{
 		adapter := adapters.NewPaystackAPIAdapter()
 
 		// list payment requests
-		paymentRequests, err := adapter.ListPaymentRequest()
+		paymentRequests, err := adapter.ListPaymentRequest(recentFlag)
 		if err != nil {
 			fmt.Println("error:", err)
 			return
 		}
 
 		fmt.Println("-------------------------------------------")
-		fmt.Println("Payment Request Lists")
+		if !recentFlag {
+			fmt.Println("Payment Request Lists")
+		} else {
+			fmt.Println("Payment Request Details")
+		}
 		fmt.Println("-------------------------------------------")
 		meta := paymentRequests.Meta
+
+		perPage := meta.PerPage
 		for i, paymentRequest := range paymentRequests.Data {
-			fmt.Printf("%d.\tRequest ID: %d\n", (meta.Page*meta.PerPage)-meta.PerPage+i+1, paymentRequest.ID)
-			fmt.Println("\tRequest Code:", paymentRequest.RequestCode)
-			fmt.Println("\tDate:", paymentRequest.CreatedAt)
-			fmt.Println("\tAmount:", paymentRequest.Currency, paymentRequest.Amount/100)
-			if len(paymentRequest.Description) > 0 {
-				fmt.Println("\tDescription:", paymentRequest.Description)
+			if !recentFlag {
+				fmt.Printf("(%d)\n", (meta.Page*int(perPage.(float64)))-int(perPage.(float64))+i+1)
 			}
-			fmt.Println("\tStatus:", paymentRequest.Status)
-			fmt.Println("\tPaid:", paymentRequest.Paid)
-			link := fmt.Sprintf("\tPayment link: %s/%s", "https://paystack.com/pay", paymentRequest.RequestCode)
+			fmt.Printf("Request ID: %d\n", paymentRequest.ID)
+			fmt.Println("Request Code:", paymentRequest.RequestCode)
+			fmt.Println("Date:", paymentRequest.CreatedAt)
+			fmt.Println("Amount:", paymentRequest.Currency, paymentRequest.Amount/100)
+			if len(paymentRequest.Description) > 0 {
+				fmt.Println("Description:", paymentRequest.Description)
+			}
+			fmt.Println("Status:", paymentRequest.Status)
+			fmt.Println("Paid:", paymentRequest.Paid)
+			link := fmt.Sprintf("Payment link: %s/%s", "https://paystack.com/pay", paymentRequest.RequestCode)
 			fmt.Println(link)
-			fmt.Println(strings.Repeat("-", len(link) + 7))
+			fmt.Println(strings.Repeat("-", len(link)+7))
 		}
 	},
 }
