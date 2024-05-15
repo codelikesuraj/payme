@@ -15,8 +15,6 @@ const (
 	PAYMENT_REQUEST_URL = "paymentrequest/"
 )
 
-var API_KEY = os.Getenv("PAYSTACK_SK")
-
 type PaystackAPIAdapter struct {
 	httpClient *http.Client
 }
@@ -37,7 +35,7 @@ func (adapter *PaystackAPIAdapter) CreateCustomer(customer models.Customer) (mod
 	if err != nil {
 		return models.CreateCustomerResp{}, err
 	}
-	req.Header.Add("Authorization", "Bearer "+API_KEY)
+	req.Header.Add("Authorization", "Bearer "+os.Getenv("PAYSTACK_SK"))
 	req.Header.Add("Content-Type", "application/json")
 
 	resp, err := adapter.httpClient.Do(req)
@@ -63,7 +61,7 @@ func (adapter *PaystackAPIAdapter) FetchCustomer(customer string) (models.FetchC
 	if err != nil {
 		return models.FetchCustomerResp{}, err
 	}
-	req.Header.Add("Authorization", "Bearer "+API_KEY)
+	req.Header.Add("Authorization", "Bearer "+os.Getenv("PAYSTACK_SK"))
 	req.Header.Add("Content-Type", "application/json")
 
 	resp, err := adapter.httpClient.Do(req)
@@ -94,7 +92,7 @@ func (adapter *PaystackAPIAdapter) CreatePaymentRequest(pr models.PaymentRequest
 	if err != nil {
 		return models.CreatePaymentRequestResp{}, err
 	}
-	req.Header.Add("Authorization", "Bearer "+API_KEY)
+	req.Header.Add("Authorization", "Bearer "+os.Getenv("PAYSTACK_SK"))
 	req.Header.Add("Content-Type", "application/json")
 
 	resp, err := adapter.httpClient.Do(req)
@@ -110,6 +108,32 @@ func (adapter *PaystackAPIAdapter) CreatePaymentRequest(pr models.PaymentRequest
 
 	if !body.Status {
 		return models.CreatePaymentRequestResp{}, errors.New(body.Message)
+	}
+
+	return body, nil
+}
+
+func (adapter *PaystackAPIAdapter) ListPaymentRequest() (models.ListPaymentRequestResp, error) {
+	req, err := http.NewRequest(http.MethodGet, BASE_URL+PAYMENT_REQUEST_URL, nil)
+	if err != nil {
+		return models.ListPaymentRequestResp{}, err
+	}
+	req.Header.Add("Authorization", "Bearer "+os.Getenv("PAYSTACK_SK"))
+	req.Header.Add("Content-Type", "application/json")
+
+	resp, err := adapter.httpClient.Do(req)
+	if err != nil {
+		return models.ListPaymentRequestResp{}, err
+	}
+	defer resp.Body.Close()
+
+	var body models.ListPaymentRequestResp
+	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
+		return models.ListPaymentRequestResp{}, err
+	}
+
+	if !body.Status {
+		return models.ListPaymentRequestResp{}, errors.New(body.Message)
 	}
 
 	return body, nil

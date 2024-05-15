@@ -10,11 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	amount      float64
-	description string
-	email       string
-)
+
 
 func init() {
 	rootCmd.AddCommand(createCmd)
