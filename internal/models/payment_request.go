@@ -3,9 +3,10 @@ package models
 import "time"
 
 type PaymentRequest struct {
-	Amount      float64 `json:"amount"`
-	Description string  `json:"description"`
-	Customer    string  `json:"customer"`
+	Amount           float64 `json:"amount"`
+	Description      string  `json:"description"`
+	Customer         string  `json:"customer"`
+	SendNotification bool    `json:"send_notification"`
 }
 
 type CreatePaymentRequestResp struct {

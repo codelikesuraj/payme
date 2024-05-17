@@ -10,12 +10,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var silent bool
+
 func init() {
 	rootCmd.AddCommand(createCmd)
+	createCmd.PersistentFlags().BoolVarP(&silent, "silent", "s", false, "create request without notifying customer")
 }
 
 var createCmd = &cobra.Command{
-	Use:   "create [amount] [customer email] [description]",
+	Use:   "create [amount] [customer email] [description] [flag]",
 	Short: "Create a paystack payment request",
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 3 {
@@ -47,9 +50,10 @@ var createCmd = &cobra.Command{
 
 		// create payment request
 		paymentRequest := models.PaymentRequest{
-			Amount:      amount * 100,
-			Description: description,
-			Customer:    customer_id,
+			Amount:           amount * 100,
+			Description:      description,
+			Customer:         customer_id,
+			SendNotification: !silent,
 		}
 
 		createdPaymentRequest, err := adapter.CreatePaymentRequest(paymentRequest)
