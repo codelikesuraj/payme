@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"payme/internal/models"
@@ -113,13 +114,21 @@ func (adapter *PaystackAPIAdapter) CreatePaymentRequest(pr models.PaymentRequest
 	return body, nil
 }
 
-func (adapter *PaystackAPIAdapter) ListPaymentRequest(recent bool) (models.ListPaymentRequestResp, error) {
+func (adapter *PaystackAPIAdapter) ListPaymentRequest(flag models.ListFlag) (models.ListPaymentRequestResp, error) {
 	url := BASE_URL + PAYMENT_REQUEST_URL
-	if recent {
+
+	if flag.Last {
 		url += "/?perPage=1"
+	} else if flag.Count > 1 {
+		url += fmt.Sprintf("/?perPage=%d", flag.Count)
 	}
+
+	if flag.Page > 0 {
+		url += fmt.Sprintf("&page=%d", flag.Page)
+	}
+
 	req, err := http.NewRequest(http.MethodGet, url, nil)
-	
+
 	if err != nil {
 		return models.ListPaymentRequestResp{}, err
 	}
@@ -131,7 +140,7 @@ func (adapter *PaystackAPIAdapter) ListPaymentRequest(recent bool) (models.ListP
 		return models.ListPaymentRequestResp{}, err
 	}
 	defer resp.Body.Close()
-	
+
 	var body models.ListPaymentRequestResp
 	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
 		return models.ListPaymentRequestResp{}, err

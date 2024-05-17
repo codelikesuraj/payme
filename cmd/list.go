@@ -3,16 +3,21 @@ package cmd
 import (
 	"fmt"
 	"payme/internal/adapters"
+	"payme/internal/models"
+	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/spf13/cobra"
 )
 
-var recentFlag bool
+var flag models.ListFlag
 
 func init() {
 	rootCmd.AddCommand(listCmd)
-	listCmd.PersistentFlags().BoolVar(&recentFlag, "recent", false, "get the most recent payment request")
+	listCmd.PersistentFlags().CountVarP(&flag.Count, "count", "c", "amount per list (max. 50)")
+	listCmd.PersistentFlags().BoolVarP(&flag.Last, "last", "l", false, "fetch only the last payment request")
+	listCmd.PersistentFlags().IntVarP(&flag.Page, "page", "p", 1, "page for list payment request")
 }
 
 var listCmd = &cobra.Command{
@@ -22,14 +27,14 @@ var listCmd = &cobra.Command{
 		adapter := adapters.NewPaystackAPIAdapter()
 
 		// list payment requests
-		paymentRequests, err := adapter.ListPaymentRequest(recentFlag)
+		paymentRequests, err := adapter.ListPaymentRequest(flag)
 		if err != nil {
 			fmt.Println("error:", err)
 			return
 		}
 
 		fmt.Println("-------------------------------------------")
-		if !recentFlag {
+		if !flag.Last {
 			fmt.Println("Payment Request Lists")
 		} else {
 			fmt.Println("Payment Request Details")
@@ -37,10 +42,18 @@ var listCmd = &cobra.Command{
 		fmt.Println("-------------------------------------------")
 		meta := paymentRequests.Meta
 
-		perPage := meta.PerPage
+		rawPerPage := meta.PerPage
+		var perPage int
+		switch reflect.TypeOf(rawPerPage).String() {
+		case "string":
+			perPage, _ = strconv.Atoi(rawPerPage.(string))
+		case "float64":
+			perPage = int(rawPerPage.(float64))
+		}
+
 		for i, paymentRequest := range paymentRequests.Data {
-			if !recentFlag {
-				fmt.Printf("(%d)\n", (meta.Page*int(perPage.(float64)))-int(perPage.(float64))+i+1)
+			if !flag.Last {
+				fmt.Printf("(%d)\n", (meta.Page*perPage)-perPage+i+1)
 			}
 			fmt.Printf("Request ID: %d\n", paymentRequest.ID)
 			fmt.Println("Request Code:", paymentRequest.RequestCode)
