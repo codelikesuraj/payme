@@ -18,7 +18,7 @@ func init() {
 }
 
 var createCmd = &cobra.Command{
-	Use:   "create [amount] [customer email] [description] [flag]",
+	Use:   "create [amount] [customer email] [description]",
 	Short: "Create a paystack payment request",
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 3 {

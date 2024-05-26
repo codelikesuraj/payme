@@ -119,7 +119,7 @@ func (adapter *PaystackAPIAdapter) ListPaymentRequest(flag models.ListFlag) (mod
 
 	if flag.Last {
 		url += "/?perPage=1"
-	} else if flag.Count > 1 {
+	} else if flag.Count >= 1 {
 		url += fmt.Sprintf("/?perPage=%d", flag.Count)
 	}
 

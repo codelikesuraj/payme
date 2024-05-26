@@ -15,7 +15,7 @@ var flag models.ListFlag
 
 func init() {
 	rootCmd.AddCommand(listCmd)
-	listCmd.PersistentFlags().CountVarP(&flag.Count, "count", "c", "amount per list (max. 50)")
+	listCmd.PersistentFlags().IntVarP(&flag.Count, "count", "c", 50, "amount per list (max. 50)")
 	listCmd.PersistentFlags().BoolVarP(&flag.Last, "last", "l", false, "fetch only the last payment request")
 	listCmd.PersistentFlags().IntVarP(&flag.Page, "page", "p", 1, "page for list payment request")
 }
