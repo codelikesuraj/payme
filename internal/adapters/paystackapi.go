@@ -11,9 +11,9 @@ import (
 )
 
 const (
-	BASE_URL            = "https://api.paystack.co/"
-	CUSTOMER_URL        = "customer/"
-	PAYMENT_REQUEST_URL = "paymentrequest/"
+	BASE_URL            = "https://api.paystack.co"
+	CUSTOMER_URL        = "customer"
+	PAYMENT_REQUEST_URL = "paymentrequest"
 )
 
 type PaystackAPIAdapter struct {
@@ -32,7 +32,11 @@ func (adapter *PaystackAPIAdapter) CreateCustomer(customer models.Customer) (mod
 		return models.CreateCustomerResp{}, err
 	}
 
-	req, err := http.NewRequest(http.MethodPost, BASE_URL+CUSTOMER_URL, bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest(
+		http.MethodPost,
+		fmt.Sprintf("%s/%s", BASE_URL, CUSTOMER_URL),
+		bytes.NewBuffer(jsonData),
+	)
 	if err != nil {
 		return models.CreateCustomerResp{}, err
 	}
@@ -58,7 +62,11 @@ func (adapter *PaystackAPIAdapter) CreateCustomer(customer models.Customer) (mod
 }
 
 func (adapter *PaystackAPIAdapter) FetchCustomer(customer string) (models.FetchCustomerResp, error) {
-	req, err := http.NewRequest(http.MethodGet, BASE_URL+CUSTOMER_URL+customer, nil)
+	req, err := http.NewRequest(
+		http.MethodGet,
+		fmt.Sprintf("%s/%s/%s", BASE_URL, CUSTOMER_URL, customer),
+		nil,
+	)
 	if err != nil {
 		return models.FetchCustomerResp{}, err
 	}
@@ -89,7 +97,11 @@ func (adapter *PaystackAPIAdapter) CreatePaymentRequest(pr models.PaymentRequest
 		return models.CreatePaymentRequestResp{}, err
 	}
 
-	req, err := http.NewRequest(http.MethodPost, BASE_URL+PAYMENT_REQUEST_URL, bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest(
+		http.MethodPost,
+		fmt.Sprintf("%s/%s", BASE_URL, PAYMENT_REQUEST_URL),
+		bytes.NewBuffer(jsonData),
+	)
 	if err != nil {
 		return models.CreatePaymentRequestResp{}, err
 	}
@@ -115,7 +127,7 @@ func (adapter *PaystackAPIAdapter) CreatePaymentRequest(pr models.PaymentRequest
 }
 
 func (adapter *PaystackAPIAdapter) ListPaymentRequest(flag models.ListFlag) (models.ListPaymentRequestResp, error) {
-	url := BASE_URL + PAYMENT_REQUEST_URL
+	url := fmt.Sprintf("%s/%s", BASE_URL, PAYMENT_REQUEST_URL)
 
 	if flag.Last {
 		url += "/?perPage=1"
@@ -142,6 +154,7 @@ func (adapter *PaystackAPIAdapter) ListPaymentRequest(flag models.ListFlag) (mod
 	defer resp.Body.Close()
 
 	var body models.ListPaymentRequestResp
+
 	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
 		return models.ListPaymentRequestResp{}, err
 	}

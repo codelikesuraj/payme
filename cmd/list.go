@@ -51,6 +51,11 @@ var listCmd = &cobra.Command{
 			perPage = int(rawPerPage.(float64))
 		}
 
+		if len(paymentRequests.Data) < 1 {
+			fmt.Printf("No payment requests found!\n\n")
+			return
+		}
+
 		for i, paymentRequest := range paymentRequests.Data {
 			if !flag.Last {
 				fmt.Printf("(%d)\n", (meta.Page*perPage)-perPage+i+1)
@@ -62,6 +67,7 @@ var listCmd = &cobra.Command{
 			if len(paymentRequest.Description) > 0 {
 				fmt.Println("Description:", paymentRequest.Description)
 			}
+			fmt.Printf("Customer: %s (%s)\n", paymentRequest.Customer.CustomerCode, paymentRequest.Customer.Email)
 			fmt.Println("Status:", paymentRequest.Status)
 			fmt.Println("Paid:", paymentRequest.Paid)
 			link := fmt.Sprintf("Payment link: %s/%s", "https://paystack.com/pay", paymentRequest.RequestCode)

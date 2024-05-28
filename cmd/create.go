@@ -64,15 +64,15 @@ var createCmd = &cobra.Command{
 
 		data := createdPaymentRequest.Data
 
-		fmt.Println("Payment request created successfully!")
 		fmt.Println("-------------------------------------------")
-		fmt.Println("Payment Request Details")
+		fmt.Println("Payment request created successfully!")
 		fmt.Println("-------------------------------------------")
 		fmt.Println("Date:", data.CreatedAt)
 		fmt.Println("Amount:", data.Currency, data.Amount/100)
 		if len(data.Description) > 0 {
 			fmt.Println("Description:", data.Description)
 		}
+		fmt.Printf("Customer: %s (%s)\n", customer_id, email)
 		fmt.Println("Status:", data.Status)
 		fmt.Println("Paid:", data.Paid)
 		fmt.Println("Payment link:", fmt.Sprintf("%s/%s", "https://paystack.com/pay", data.RequestCode))
