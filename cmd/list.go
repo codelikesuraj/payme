@@ -68,7 +68,9 @@ var listCmd = &cobra.Command{
 			fmt.Println("Status:", paymentRequest.Status)
 			fmt.Println("Paid:", paymentRequest.Paid)
 			link := fmt.Sprintf("Payment link: %s/%s", "https://paystack.com/pay", paymentRequest.RequestCode)
-			fmt.Println(link)
+			if !paymentRequest.Paid {
+				fmt.Println(link)
+			}
 			fmt.Println(strings.Repeat("-", len(link)+7))
 		}
 	},
