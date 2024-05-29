@@ -24,10 +24,7 @@ var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List all paystack payment requests",
 	Run: func(cmd *cobra.Command, args []string) {
-		adapter := adapters.NewPaystackAPIAdapter()
-
-		// list payment requests
-		paymentRequests, err := adapter.ListPaymentRequest(flag)
+		paymentRequests, err := adapters.NewPaystackAPIAdapter().ListPaymentRequest(flag)
 		if err != nil {
 			fmt.Println("error:", err)
 			return

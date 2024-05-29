@@ -165,3 +165,31 @@ func (adapter *PaystackAPIAdapter) ListPaymentRequest(flag models.ListFlag) (mod
 
 	return body, nil
 }
+
+func (adapter *PaystackAPIAdapter) FetchPaymentRequest(requestCode string) (models.FetchPaymentRequestResp, error) {
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/%s/%s", BASE_URL, PAYMENT_REQUEST_URL, requestCode), nil)
+
+	if err != nil {
+		return models.FetchPaymentRequestResp{}, err
+	}
+	req.Header.Add("Authorization", "Bearer "+os.Getenv("PAYSTACK_SK"))
+	req.Header.Add("Content-Type", "application/json")
+
+	resp, err := adapter.httpClient.Do(req)
+	if err != nil {
+		return models.FetchPaymentRequestResp{}, err
+	}
+	defer resp.Body.Close()
+
+	var body models.FetchPaymentRequestResp
+
+	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
+		return models.FetchPaymentRequestResp{}, err
+	}
+
+	if !body.Status {
+		return models.FetchPaymentRequestResp{}, errors.New(body.Message)
+	}
+
+	return body, nil
+}
