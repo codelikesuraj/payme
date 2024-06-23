@@ -16,7 +16,8 @@ payme [command] [args...] [flags...]
 ## Available commands
 |Command|Description|Args|Flags [optional]|
 |-|-|-|-|
-|create|create a paystack payment request|{amount} {customer email} {description}|-s,--silent => do not send email notification|
-|list|list all paystack payment requests|none|-c, --count {count} => no. of payment requests per list/page (max. 50)|
-||||-l, --last => only the last payment request|
-||||-p, --page {page} => page for payment requests list (default 1)|
+|create|create a paystack payment request|{amount} {customer email} {description}|-s,--silent: do not send email notification|
+|list|list all paystack payment requests|none|-c, --count {count}: no. of payment requests per list/page (max. 50)|
+||||-l, --last: only the last payment request|
+||||-p, --page {page}: page for payment requests list (default 1)|
+|fetch|fetch a paystack payment request|{request code/request ID}|-|
