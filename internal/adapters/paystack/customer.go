@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	models "payme/internal/domain"
+	"payme/internal/domain"
 )
 
 type CustomerAdapter struct {
@@ -24,10 +24,10 @@ func NewCustomerAdapter(apiKey string) *CustomerAdapter {
 	}
 }
 
-func (adapter *CustomerAdapter) CreateCustomer(customer models.Customer) (models.CreateCustomerResp, error) {
+func (adapter *CustomerAdapter) CreateCustomer(customer domain.Customer) (domain.CreateCustomerResp, error) {
 	jsonData, err := json.Marshal(customer)
 	if err != nil {
-		return models.CreateCustomerResp{}, err
+		return domain.CreateCustomerResp{}, err
 	}
 
 	req, err := http.NewRequest(
@@ -36,54 +36,54 @@ func (adapter *CustomerAdapter) CreateCustomer(customer models.Customer) (models
 		bytes.NewBuffer(jsonData),
 	)
 	if err != nil {
-		return models.CreateCustomerResp{}, err
+		return domain.CreateCustomerResp{}, err
 	}
 	req.Header.Add("Authorization", "Bearer "+os.Getenv("PAYSTACK_SK"))
 	req.Header.Add("Content-Type", "application/json")
 
 	resp, err := adapter.client.Do(req)
 	if err != nil {
-		return models.CreateCustomerResp{}, err
+		return domain.CreateCustomerResp{}, err
 	}
 	defer resp.Body.Close()
 
-	var body models.CreateCustomerResp
+	var body domain.CreateCustomerResp
 	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
-		return models.CreateCustomerResp{}, err
+		return domain.CreateCustomerResp{}, err
 	}
 
 	if !body.Status {
-		return models.CreateCustomerResp{}, errors.New(body.Message)
+		return domain.CreateCustomerResp{}, errors.New(body.Message)
 	}
 
 	return body, nil
 }
 
-func (adapter *CustomerAdapter) FetchCustomer(customer string) (models.FetchCustomerResp, error) {
+func (adapter *CustomerAdapter) FetchCustomer(customer string) (domain.FetchCustomerResp, error) {
 	req, err := http.NewRequest(
 		http.MethodGet,
 		fmt.Sprintf("%s/%s/%s", BASE_URL, CUSTOMER_URL, customer),
 		nil,
 	)
 	if err != nil {
-		return models.FetchCustomerResp{}, err
+		return domain.FetchCustomerResp{}, err
 	}
 	req.Header.Add("Authorization", "Bearer "+os.Getenv("PAYSTACK_SK"))
 	req.Header.Add("Content-Type", "application/json")
 
 	resp, err := adapter.client.Do(req)
 	if err != nil {
-		return models.FetchCustomerResp{}, err
+		return domain.FetchCustomerResp{}, err
 	}
 	defer resp.Body.Close()
 
-	var body models.FetchCustomerResp
+	var body domain.FetchCustomerResp
 	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
-		return models.FetchCustomerResp{}, err
+		return domain.FetchCustomerResp{}, err
 	}
 
 	if !body.Status {
-		return models.FetchCustomerResp{}, errors.New(body.Message)
+		return domain.FetchCustomerResp{}, errors.New(body.Message)
 	}
 
 	return body, nil

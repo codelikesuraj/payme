@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	models "payme/internal/domain"
+	"payme/internal/domain"
 )
 
 type PaymentRequestAdapter struct {
@@ -24,10 +24,10 @@ func NewPaymentRequestAdapter(apiKey string) *PaymentRequestAdapter {
 	}
 }
 
-func (adapter *PaymentRequestAdapter) CreatePaymentRequest(pr models.PaymentRequest) (models.CreatePaymentRequestResp, error) {
+func (adapter *PaymentRequestAdapter) CreatePaymentRequest(pr domain.PaymentRequest) (domain.CreatePaymentRequestResp, error) {
 	jsonData, err := json.Marshal(pr)
 	if err != nil {
-		return models.CreatePaymentRequestResp{}, err
+		return domain.CreatePaymentRequestResp{}, err
 	}
 
 	req, err := http.NewRequest(
@@ -36,30 +36,30 @@ func (adapter *PaymentRequestAdapter) CreatePaymentRequest(pr models.PaymentRequ
 		bytes.NewBuffer(jsonData),
 	)
 	if err != nil {
-		return models.CreatePaymentRequestResp{}, err
+		return domain.CreatePaymentRequestResp{}, err
 	}
 	req.Header.Add("Authorization", "Bearer "+os.Getenv("PAYSTACK_SK"))
 	req.Header.Add("Content-Type", "application/json")
 
 	resp, err := adapter.client.Do(req)
 	if err != nil {
-		return models.CreatePaymentRequestResp{}, err
+		return domain.CreatePaymentRequestResp{}, err
 	}
 	defer resp.Body.Close()
 
-	var body models.CreatePaymentRequestResp
+	var body domain.CreatePaymentRequestResp
 	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
-		return models.CreatePaymentRequestResp{}, err
+		return domain.CreatePaymentRequestResp{}, err
 	}
 
 	if !body.Status {
-		return models.CreatePaymentRequestResp{}, errors.New(body.Message)
+		return domain.CreatePaymentRequestResp{}, errors.New(body.Message)
 	}
 
 	return body, nil
 }
 
-func (adapter *PaymentRequestAdapter) ListPaymentRequest(flag models.ListFlag) (models.ListPaymentRequestResp, error) {
+func (adapter *PaymentRequestAdapter) ListPaymentRequest(flag domain.ListFlag) (domain.ListPaymentRequestResp, error) {
 	url := fmt.Sprintf("%s/%s", BASE_URL, PAYMENT_REQUEST_URL)
 
 	if flag.Last {
@@ -75,53 +75,53 @@ func (adapter *PaymentRequestAdapter) ListPaymentRequest(flag models.ListFlag) (
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 
 	if err != nil {
-		return models.ListPaymentRequestResp{}, err
+		return domain.ListPaymentRequestResp{}, err
 	}
 	req.Header.Add("Authorization", "Bearer "+os.Getenv("PAYSTACK_SK"))
 	req.Header.Add("Content-Type", "application/json")
 
 	resp, err := adapter.client.Do(req)
 	if err != nil {
-		return models.ListPaymentRequestResp{}, err
+		return domain.ListPaymentRequestResp{}, err
 	}
 	defer resp.Body.Close()
 
-	var body models.ListPaymentRequestResp
+	var body domain.ListPaymentRequestResp
 
 	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
-		return models.ListPaymentRequestResp{}, err
+		return domain.ListPaymentRequestResp{}, err
 	}
 
 	if !body.Status {
-		return models.ListPaymentRequestResp{}, errors.New(body.Message)
+		return domain.ListPaymentRequestResp{}, errors.New(body.Message)
 	}
 
 	return body, nil
 }
 
-func (adapter *PaymentRequestAdapter) FetchPaymentRequest(requestCode string) (models.FetchPaymentRequestResp, error) {
+func (adapter *PaymentRequestAdapter) FetchPaymentRequest(requestCode string) (domain.FetchPaymentRequestResp, error) {
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/%s/%s", BASE_URL, PAYMENT_REQUEST_URL, requestCode), nil)
 
 	if err != nil {
-		return models.FetchPaymentRequestResp{}, err
+		return domain.FetchPaymentRequestResp{}, err
 	}
 	req.Header.Add("Authorization", "Bearer "+os.Getenv("PAYSTACK_SK"))
 	req.Header.Add("Content-Type", "application/json")
 
 	resp, err := adapter.client.Do(req)
 	if err != nil {
-		return models.FetchPaymentRequestResp{}, err
+		return domain.FetchPaymentRequestResp{}, err
 	}
 	defer resp.Body.Close()
 
-	var body models.FetchPaymentRequestResp
+	var body domain.FetchPaymentRequestResp
 
 	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
-		return models.FetchPaymentRequestResp{}, err
+		return domain.FetchPaymentRequestResp{}, err
 	}
 
 	if !body.Status {
-		return models.FetchPaymentRequestResp{}, errors.New(body.Message)
+		return domain.FetchPaymentRequestResp{}, errors.New(body.Message)
 	}
 
 	return body, nil

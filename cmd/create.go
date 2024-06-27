@@ -28,7 +28,7 @@ var createCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		adapter := paystack.NewCustomerAdapter(os.Getenv("PAYSTACK_PK"))
+		customerAdapter := paystack.NewCustomerAdapter(os.Getenv("PAYSTACK_PK"))
 		amount, _ := strconv.ParseFloat(args[0], 64)
 		email := args[1]
 		description := args[2]
@@ -37,9 +37,9 @@ var createCmd = &cobra.Command{
 		// create new if not exists
 		var customer_id string
 
-		customer, err := adapter.FetchCustomer(email)
+		customer, err := customerAdapter.FetchCustomer(email)
 		if err != nil {
-			new_customer, err := adapter.CreateCustomer(domain.Customer{Email: email})
+			new_customer, err := customerAdapter.CreateCustomer(domain.Customer{Email: email})
 			if err != nil {
 				fmt.Println("error:", err)
 				return
