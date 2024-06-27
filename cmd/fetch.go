@@ -3,7 +3,8 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"payme/internal/adapters"
+	"os"
+	"payme/internal/adapters/paystack"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -14,8 +15,8 @@ func init() {
 }
 
 var fetchCmd = &cobra.Command{
-	Use:   "fetch [request code/ID]",
-	Short: "Fetch a paystack payment request",
+	Use:                   "fetch [request code/ID]",
+	Short:                 "Fetch a paystack payment request",
 	DisableFlagsInUseLine: true,
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
@@ -24,7 +25,7 @@ var fetchCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		paymentRequest, err := adapters.NewPaystackAPIAdapter().FetchPaymentRequest(args[0])
+		paymentRequest, err := paystack.NewPaymentRequestAdapter(os.Getenv("PAYSTACK_SK")).FetchPaymentRequest(args[0])
 		if err != nil {
 			fmt.Println("error:", err)
 			return

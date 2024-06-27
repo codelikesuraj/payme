@@ -2,8 +2,9 @@ package cmd
 
 import (
 	"fmt"
-	"payme/internal/adapters"
-	"payme/internal/models"
+	"os"
+	"payme/internal/adapters/paystack"
+	"payme/internal/domain"
 	"reflect"
 	"strconv"
 	"strings"
@@ -11,7 +12,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var flag models.ListFlag
+var flag domain.ListFlag
 
 func init() {
 	rootCmd.AddCommand(listCmd)
@@ -24,7 +25,7 @@ var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List all paystack payment requests",
 	Run: func(cmd *cobra.Command, args []string) {
-		paymentRequests, err := adapters.NewPaystackAPIAdapter().ListPaymentRequest(flag)
+		paymentRequests, err := paystack.NewPaymentRequestAdapter(os.Getenv("PAYSTACK_SK")).ListPaymentRequest(flag)
 		if err != nil {
 			fmt.Println("error:", err)
 			return

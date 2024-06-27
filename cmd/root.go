@@ -9,12 +9,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	amount      float64
-	description string
-	email       string
-)
-
 var rootCmd = &cobra.Command{
 	Use:   "payme",
 	Short: "Manage your paystack payment request from the CLI",

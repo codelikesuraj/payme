@@ -3,8 +3,9 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"payme/internal/adapters"
-	"payme/internal/models"
+	"os"
+	"payme/internal/adapters/paystack"
+	"payme/internal/domain"
 	"strconv"
 
 	"github.com/spf13/cobra"
@@ -27,10 +28,10 @@ var createCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		adapter := adapters.NewPaystackAPIAdapter()
-		amount, _ = strconv.ParseFloat(args[0], 64)
-		email = args[1]
-		description = args[2]
+		adapter := paystack.NewCustomerAdapter(os.Getenv("PAYSTACK_PK"))
+		amount, _ := strconv.ParseFloat(args[0], 64)
+		email := args[1]
+		description := args[2]
 
 		// validate customer
 		// create new if not exists
@@ -38,7 +39,7 @@ var createCmd = &cobra.Command{
 
 		customer, err := adapter.FetchCustomer(email)
 		if err != nil {
-			new_customer, err := adapter.CreateCustomer(models.Customer{Email: email})
+			new_customer, err := adapter.CreateCustomer(domain.Customer{Email: email})
 			if err != nil {
 				fmt.Println("error:", err)
 				return
@@ -49,14 +50,14 @@ var createCmd = &cobra.Command{
 		}
 
 		// create payment request
-		paymentRequest := models.PaymentRequest{
+		paymentRequest := domain.PaymentRequest{
 			Amount:           amount * 100,
 			Description:      description,
 			Customer:         customer_id,
 			SendNotification: !silent,
 		}
 
-		createdPaymentRequest, err := adapter.CreatePaymentRequest(paymentRequest)
+		createdPaymentRequest, err := paystack.NewPaymentRequestAdapter(os.Getenv("PAYSTACK_SK")).CreatePaymentRequest(paymentRequest)
 		if err != nil {
 			fmt.Println("error:", err)
 			return
